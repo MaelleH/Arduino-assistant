@@ -25,6 +25,7 @@ void InitCommunicationBluetoothSerie(){
          Serial.println("Attente bluetooth");
     }
     Serial.println("Demarrage bluetooth connexion serie : Ok");
+    printHelp();
 }
 
 // La loop permet d'être constament dans l'attente d'instruction

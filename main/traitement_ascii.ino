@@ -40,25 +40,33 @@ void ReceptionBluetoothAscii(char* c){
       Serial1.print("Que voulez vous baisser?");
     }
   }else if(strstr(c, actions[4])){
-    
+    printInfos();
   }
   
 }
 
 void printOkToClient(int action, int module, int feminin){
   Serial1.print("D'accord, j'");
-  Serial1.println(actions[action]);
+  Serial1.print(actions[action]);
   if(feminin == 0){
-    Serial1.println(" le ");
+    Serial1.print(" le ");
   }else{
-    Serial1.println(" la ");
+    Serial1.print(" la ");
   }
   Serial1.println(modules[module]);
 }
 
 void printInfos(){
     Serial1.println("Voici les infos :");
-    Serial1.println("   - Il fait x degrés et le chauffage est éteint/allumé");
-    Serial1.println("   - La lumière est éteinte/allumée à la puissance 1/2/3");
-    Serial1.println("   - La musique est éteinte/allumée et joue la chanson x \n");
+    Serial1.println("   - Il fait x degres et le chauffage est eteint/allume");
+    Serial1.println("   - La lumiere est eteinte/allumee a la puissance 1/2/3");
+    Serial1.println("   - La musique est eteinte/allumee et joue la chanson x \n");
+}
+
+
+void printHelp(){
+    Serial1.println("Bonjour, je suis blup votre assistant domotique. Vous pouvez me demander plusieurs choses comme par exemple :");
+    Serial1.println("   - Eteindre/Allumer la lumiere, le chauffage ou la musique : Blup, allume la lumiere");
+    Serial1.println("   - Monter/Baisser la temperature ou l'intensite de la lumiere : Blup, baisse la temperature");
+    Serial1.println("   - Afficher les informations de la maison : Blup, quelles sont les infos?");
 }
