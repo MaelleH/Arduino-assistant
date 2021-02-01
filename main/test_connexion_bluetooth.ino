@@ -56,14 +56,18 @@ void emissionVersTel(String c) {
 
 //Permet de receptionner ce qui provient du telephone
 void receptionDeTel(char c) {
-  String s = "";
+  char s[50]; 
+  int i = 0;
+  
   if(Serial1.available()){
     Serial.print("Reception de : ");
     while (Serial1.available()) {
       c = Serial1.read();
-      ReceptionBluetoothAscii(c);
-      s+=c;
+      s[i] = c;
+      i+=1;
     }
-    Serial1.println(s);
+    
+    ReceptionBluetoothAscii(s);
+    Serial1.println(strlen(s));
   }
 }

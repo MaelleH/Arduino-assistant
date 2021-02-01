@@ -1,96 +1,64 @@
 //Fonction qui permet de traiter le caractère reçu depuis le téléphone
-/*void ReceptionBluetoothAscii(char c){
-    switch (c) { // UNe fois en jeu, selon le caractère reçu
-      case 'Q':
-        Serial.println("left"); // aller à gauche
-        Serial1.println("go");
-        break;
-      case 'D':
-        Serial.println("right"); // aller à droite
-        break;
-      case 'Z':
-        Serial.println("jump"); // sauter
-        break;
-      case 'M':
-        Serial.println("fire"); // tirer
-        break;
-      default:
-        Serial1.println("nothing");
-        break;
-    }
-}*/
+char actions[][10] ={"allume", "eteins", "monte", "baisse", "info"};
+char modules[][20] ={"musique", "lumière", "chauffage", "temperature"};
 
-void ReceptionBluetoothAsciiString(String c){
-  if(strstr(c,"allume")){
-    
-  }else if(strstr(c,"éteind") || strstr(c,"eteind")){
-    
-  }else if(strstr(c,"monte")){
-    
-  }else if(strstr(c,"baisse")){
+void ReceptionBluetoothAscii(char* c){
+  if(strstr(c,actions[0])){
+    if(strstr(c, modules[0])){
+      printOkToClient(0,0,1);
+    }else if(strstr(c, modules[1])){
+      printOkToClient(0,1,1);
+    }else if(strstr(c, modules[2])){
+      printOkToClient(0,2,0);       
+    }else{
+      Serial1.print("Que voulez vous allumer?");
+    }
+  }else if(strstr(c, actions[1])){
+    if(strstr(c, modules[0])){
+      printOkToClient(1,0,1);
+    }else if(strstr(c, modules[1])){
+      printOkToClient(1,1,1);
+    }else if(strstr(c, modules[2])){
+      printOkToClient(1,2,0);       
+    }else{
+      Serial1.print("Que voulez vous éteindre?");
+    }
+  }else if(strstr(c, actions[2])){
+    if(strstr(c, modules[1])){
+      printOkToClient(2,1,1);
+    }else if(strstr(c, modules[3])){
+      printOkToClient(2,3,1);
+    }else {
+      Serial1.print("Que voulez vous monter?");
+    }
+  }else if(strstr(c, actions[3])){
+     if(strstr(c, modules[1])){
+      printOkToClient(3,1,1);
+    }else if(strstr(c, modules[3])){
+      printOkToClient(3,3,1);
+    }else {
+      Serial1.print("Que voulez vous baisser?");
+    }
+  }else if(strstr(c, actions[4])){
     
   }
   
-    switch (c) { // UNe fois en jeu, selon le caractère reçu
-      case strstr(c,"allume"):
-        Serial.println("left"); // aller à gauche
-        Serial1.println("go");
-        break;
-      case 'D':
-        Serial.println("right"); // aller à droite
-        break;
-      case 'Z':
-        Serial.println("jump"); // sauter
-        break;
-      case 'M':
-        Serial.println("fire"); // tirer
-        break;
-      default:
-        Serial1.println("nothing");
-        break;
-    }
-}
-/*
-// Fonction permettant l'affichage des règles
-void printRules(){
-  emissionVersTel("\n");
-  emissionVersTel("RUno - Help\n");
-  emissionVersTel("P = Bouton start/stop\n");
-  emissionVersTel("Q = Bouton deplacement vers la gauche\n");
-  emissionVersTel("D = Bouton deplacement vers la droite\n");
-  emissionVersTel("Z = Bouton effectuer un saut\n");
-  emissionVersTel("M = Bouton envoi d'un missile\n");
 }
 
-// Fonction affichant le game over
-void printLoser() {
-  emissionVersTel("\n---------------\n");
-  emissionVersTel("PERDU\n");
-  emissionVersTel(String(getScore()));
-  emissionVersTel("\n---------------\n");
-}
-
-// Fonction permettant à l'utilisateur de saisir son pseudo
-void setUsername(char pseudo) {
-  if (pseudo == '.') { // Si il a fini de saisir et qu'il fait .
-    stateUsername = 2;
-    setupGame();
-  } else {
-    if (username == "Player") { // SI l'username est celui d'origine
-      username = pseudo;
-    } else {
-      username += pseudo;
-    }
+void printOkToClient(int action, int module, int feminin){
+  Serial1.print("D'accord, j'");
+  Serial1.println(actions[action]);
+  if(feminin == 0){
+    Serial1.println(" le ");
+  }else{
+    Serial1.println(" la ");
   }
+  Serial1.println(modules[module]);
 }
 
-// Affichage du score
-void printScore() {
-  emissionVersTel("\n---------------------");
-  emissionVersTel(getUsername());
-  emissionVersTel("\n---------------------");
-  emissionVersTel("\nLife = "+ String(getLifePoints()));
-  emissionVersTel("\nScore = " + String(getScore()));
-  emissionVersTel("\nLevel = " + String(getLevel()));
-  emissionVersTel("\n---------------------\n");
-}*/
+void printInfos(){
+    Serial1.println("Voici les infos :");
+    Serial1.println("   - Il fait x degrés et le chauffage est éteint/allumé");
+    Serial1.println("   - La lumière est éteinte/allumée à la puissance 1/2/3");
+    Serial1.println("   - La musique est éteinte/allumée et joue la chanson x \n");
+}
