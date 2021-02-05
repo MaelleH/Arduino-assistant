@@ -1,16 +1,13 @@
 
 char c;
 String s;
-#define rxPin 19 // Broche 11 en tant que RX, à raccorder sur TX du HC-05
-#define txPin 18 // Broche 10 en tant que TX, à raccorder sur RX du HC-05
-#define HC05 Serial1;
 
-//#define HC05 Serial1
 
 void setup() {
   //setupBluetooth();
   Serial.begin(9600);
-  Serial1.begin(38400); 
+  Serial1.begin(9600); 
+  Serial2.begin(38400); 
 }
 
 void loop() {
@@ -20,10 +17,13 @@ void loop() {
         Serial.println("YO LE RAP");
         while(Serial.available()){
             c=Serial.read();
+            Serial2.println(c);
+            Serial1.println(c);
             Serial.println(c);
             s+=c;
         }
         Serial.println(s);
+        s="";
       }
 
       if(Serial1.available()){
@@ -34,7 +34,17 @@ void loop() {
         }
         s="";
       }
+      
+      if(Serial2.available()){
+        Serial.println("COMMENT VA 2");
+        while(Serial2.available()){
+            s=Serial2.readString();
+            Serial.println(s);
+        }
+        s="";
+      }
 
+      
   /*if(Serial.available()){
     Serial.println("YO LE RAP");
     while(Serial.available()){
