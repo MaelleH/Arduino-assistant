@@ -17,12 +17,13 @@ unsigned long startMillis;
 unsigned long currentMillis;
 
 int photores; //Variable de stockage de la valeur de la photoresistance
-int tempMax; //Temperature maximum
-int tempMin; //Temperature minimum
+int tempMax = 28; //Temperature maximum
+int tempMin = 20; //Temperature minimum
 
 //Booleens de test des differents etats
-bool chauffageAllumer;
-bool chauffageCouper;
+bool chauffageAllume;
+bool asktemp;
+bool chauffageAuto;
 
 
 //-------------------------------------------------------------------------
@@ -35,9 +36,9 @@ void setup() {
   InitCommunicationSerie() ; //Initialisation de la carte
   Serial.println("Initialisation carte : Ok");
 
-  chauffageAllumer = false;
-  chauffageCouper = false;
-
+  asktemp = false;
+  chauffageAuto = true;
+  chauffageAllume = false;
 
   // Configuration des Pins du bluetooth 1 et 2
   pinMode(RxD, INPUT);  
@@ -66,18 +67,38 @@ void loop() {
        message = BTSerie.read();
        Serial.print(message);
        if(message == 't'){
+          asktemp = true;
           temperature = getTemp();
-          Serial.print(temperature);
-          BTSerie.println(temperature);
-       } else if(message == 'a') {
-          digitalWrite(ledChauffage, HIGH); //Allume la led
-       } else if(message == 'e') {
+       } else if(message == 'a' && !chauffageAllume) {
+          chauffageAllume = true;
+          digitalWrite(ledChauffage, HIGH); //Allume la led       
+       } else if(message == 'e' && chauffageAllume) {
+          chauffageAllume = false;
           digitalWrite(ledChauffage, LOW); //Eteint la led
-       } else if(message == 'm') {
-          photoresCatch(); //Met a jour la temperature max et min en fonction de la luminosite
-          Serial.print(tempMax);
-       }
+       } 
    }
+
+  //Si la temperature du salon est demandee ou qu'il s'est passe environs 5 min
+   if(asktemp == true || currentMillis - startMillis >= 180000) {
+    asktemp = false;
+    BTSerie.println(temperature); //On affiche la temperature sur le potable
+    photoresCatch(); //Met a jour le min et le max en fonction de la luminosite
+
+    //Verification du depassement des temperatures max et min et si le chauffage est deja en cours d'utilisation ou non
+    if(temperature >= tempMax && chauffageAllume) {
+          //Si la temperature max est depasse on propose d'eteindre le chauffage
+          BTSerie.println("La temperature max est depassee dans le salon, le chauffage va s'eteindre");
+          chauffageAllume = false;
+          digitalWrite(ledChauffage, LOW); //Eteint la led
+    } else if (temperature <= tempMin && !chauffageAllume) {
+          //Si la temperature min est depassee on propose d'allumer le chauffage
+          BTSerie.println("La temperature minimal est depassee dans le salon, le chauffage va s'allumer");
+          chauffageAllume = true;
+          digitalWrite(ledChauffage, HIGH); //Allume la led   
+    }
+    
+    startMillis = currentMillis;  //Mise a jour du timer
+  }
   if (Serial.available()) {
       message = Serial.read();
       BTSerie.print(message);
@@ -98,7 +119,6 @@ float getTemp(){
 void photoresCatch() {
   
   photores = analogRead(A1); //Reccuperation du retour de la photoresistance
-  Serial.print(photores);
   //Si il y a beaucoup de luminosite (on estime qu'il fait jour)
   if(photores >= 930) {
     //On augmente les temperatures max et min
