@@ -24,6 +24,7 @@ int tempMin = 20; //Temperature minimum
 bool chauffageAllume;
 bool asktemp;
 bool chauffageAuto;
+String msg;
 
 
 //-------------------------------------------------------------------------
@@ -59,23 +60,24 @@ void loop() {
   //Initialisation des variables
   char input;
   String test;
-  char message;
   
 
   currentMillis = millis();  //Reccuperation du temps actuel
-  if (BTSerie.available()) {
-       message = BTSerie.read();
-       Serial.print(message);
-       if(message == 't'){
-          asktemp = true;
-          temperature = getTemp();
-       } else if(message == 'a' && !chauffageAllume) {
-          chauffageAllume = true;
-          digitalWrite(ledChauffage, HIGH); //Allume la led       
-       } else if(message == 'e' && chauffageAllume) {
-          chauffageAllume = false;
-          digitalWrite(ledChauffage, LOW); //Eteint la led
-       } 
+   readSerialPort();
+   if(msg!=""){
+     Serial.print(msg);
+     if(msg[0] == 't'){
+        asktemp = true;
+        temperature = getTemp();
+        Serial.println(temperature);
+     } else if(msg[0] == 'a' && !chauffageAllume) {
+        chauffageAllume = true;
+        digitalWrite(ledChauffage, HIGH); //Allume la led       
+     } else if(msg[0] == 'e' && chauffageAllume) {
+        chauffageAllume = false;
+        digitalWrite(ledChauffage, LOW); //Eteint la led
+     } 
+     msg=""; 
    }
 
   //Si la temperature du salon est demandee ou qu'il s'est passe environs 5 min
@@ -100,8 +102,8 @@ void loop() {
     startMillis = currentMillis;  //Mise a jour du timer
   }
   if (Serial.available()) {
-      message = Serial.read();
-      BTSerie.print(message);
+      msg = Serial.read();
+      BTSerie.print(msg);
   }
 }
 
@@ -133,6 +135,17 @@ void photoresCatch() {
   }
 }
 
+void readSerialPort(){
+ while (BTSerie.available()) {
+   delay(10); 
+   if (BTSerie.available() >0) {
+     char c = BTSerie.read();  //gets one byte from serial buffer
+     msg += c; //makes the string readString
+   }
+ }
+ BTSerie.flush();
+}
+
 //------------------------------------------------------------
 
 //--------------------Initialisation de la communication serie avec l'ordinateur--------------------------
@@ -146,7 +159,7 @@ void InitCommunicationSerie() {
 
 
 void InitCommunicationBluetoothSerie() {
-  BTSerie.begin(38400);  //9600 den mode normal / 38400 en mode commande
+  BTSerie.begin(9600);  //9600 den mode normal / 38400 en mode commande
   while (!BTSerie) {
       Serial.println("Attente reponse bluetooth");
   }
