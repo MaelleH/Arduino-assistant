@@ -11,6 +11,11 @@ void setupBluetooth() {
   InitCommunicationBluetoothSerie();
 }
 
+void setupBluetoothSlave() {
+  Serial.begin(38400); 
+}
+
+
 //Initialialise la communication série
 void InitCommunicationSerie(){
     Serial.begin(9600);
