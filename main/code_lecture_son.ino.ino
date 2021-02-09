@@ -1,4 +1,4 @@
-//Libraries 
+/*//Libraries 
 #include <SD.h>
 #include <TMRpcm.h>
  
@@ -14,14 +14,14 @@ unsigned long previousTime=0;
 unsigned long interval=1000;
 
 //Objects
-TMRpcm tmrpcm;
+TMRpcm tmrpcm;*/
 
 /*******************************************************************
  *                                MAIN
 *******************************************************************/
-void setup(){
+//void setup(){
 /* function setup */
-  Serial.begin(9600);
+  /*Serial.begin(9600);
   //Init sd shield
   if (!SD.begin(SD_ChipSelectPin)) {Serial.println("SD fail"); return; }
 
@@ -37,10 +37,10 @@ tmrpcm.setVolume(3);
 
 
 
-void loop(){
+void loop(){*/
 
 /* function loop */
-
+/*
 if(millis()-previousTime>interval){
 
 activateOutput();
@@ -50,18 +50,18 @@ previousTime=millis();
 }
 
 }
-
+*/
 /*******************************************************************
 
  *                               FUNCTIONS
 
  *******************************************************************/
 
-void activateOutput(){
+//void activateOutput(){
 
 /* function activateOutput */
 
-Serial.println("Play sound");
+/*Serial.println("Play sound");
 
 tmrpcm.play(file);
 //tone(9, 1000);
@@ -69,4 +69,4 @@ while(tmrpcm.isPlaying()){}//wait until file is played
 
 //delay(1000);tmrpcm.stopPlayback(); // or wait 1sec and stop music
 
-}
+}*/
