@@ -3,18 +3,17 @@
 //--------------------DECLARATIONS DE VARIABLES---------------------------
 
 #define RxD 10    //Pin RX donc vers TxD de la carte Bluetooth1
-#define TxD 11   //Pin TX donc vers RxD de la carte Bluetooth1
+#define TxD 11   //Pin TX donc vers RxD de la carte Bluetooth1 
 #define RxD2 6    //Pin RX donc vers TxD de la carte Bluetooth2
 #define TxD2 7   //Pin TX donc vers RxD de la carte Bluetooth2
 
 //Definition des structures de donnees pour les differents module
-SoftwareSerial BTSerie(RxD,TxD); //Module bluetooth 1
-SoftwareSerial BTSerie2(RxD2,TxD2); //Module bluetooth 2
+SoftwareSerial BTSerie(RxD,TxD); //Module bluetooth 1 => ARDUINO
+SoftwareSerial BTSerie2(RxD2,TxD2); //Module bluetooth 2 => TELEPHONE
 
 String msg;
 String answer;
 String portable;
-
 //-------------------Initialisation de la carte et des differents modules------------------
 void setup() {
   
@@ -31,6 +30,8 @@ void setup() {
   //Initialisation des modules bluetooth
   InitCommunicationBluetoothSerie2();
   InitCommunicationBluetoothSerie();
+
+  printHelp();
   BTSerie2.listen();
 }
 
@@ -41,40 +42,22 @@ void setup() {
 void loop() {
   //Si le module bluetooth 2 est a l'ecoute
   if(BTSerie2.isListening()) {
+    if(BTSerie2.available()){
+     char s[] ="";
     //Tant qu'il est en reception
      while (BTSerie2.available() > 0) { 
         msg = BTSerie2.readString(); //Reccuperation de l'entree
         Serial.println(msg); //Afficage de la temperature sur le premier portable
-        BTSerie.listen(); //Met le premier module bluetooth en ecoute
+        strcat(s,&msg[0]);
      }
+     if(s != ""){
+       ReceptionBluetoothAscii(s);
+     }
+    }
   }
   
   //readSerialPort();
-  if(BTSerie.isListening()) {
-    //Read answer from slave
-     while (BTSerie.available()) {
-     delay(10);  
-     if (BTSerie.available() >0) {
-       char c = BTSerie.read();  //gets one byte from serial buffer
-       answer += c; //makes the string readString
-     }
-   }
-    //Send data to slave
-    if(msg!=""){
-      Serial.print("Master sent : ");
-      Serial.println(msg);
-      BTSerie.print(msg);
-      msg="";
-    }
-    //Send answer to monitor
-    if(answer!=""){
-      Serial.print("Slave recieved : ");
-      Serial.println(answer);
-      answer="";
-    }
-    BTSerie2.listen(); //Met le premier module bluetooth en ecoute
-  }
-  
+
 }
 
 void readSerialPort(){
@@ -86,6 +69,48 @@ void readSerialPort(){
    }
  }
  Serial.flush();
+}
+
+String handleAskArduino(String c){
+  sendMessageArduino(c);
+  return waitForArduinoMessage();
+}
+
+void sendMessageArduino(String c){
+  BTSerie.print(c);
+  Serial.print("message envoye a l'arduino");
+}
+
+
+String waitForArduinoMessage(){
+    Serial.print("dans l'attente d'une reponse");
+    BTSerie.listen(); //Met le premier module bluetooth en ecoute
+    if(BTSerie.isListening()) {
+    //Read answer from slave
+     while (BTSerie.available()) {
+       if (BTSerie.available() >0) {
+         char c = BTSerie.read();  //gets one byte from serial buffer
+         answer += c; //makes the string readString
+       }
+     }
+
+     Serial.print("réponse reçue" + answer);
+ /*   //Send data to slave
+    if(msg!=""){
+      Serial.print("Master sent : ");
+      Serial.println(msg);
+      BTSerie.print(msg);
+      msg="";
+    }
+    //Send answer to monitor
+    if(answer!=""){
+      Serial.print("Slave recieved : ");
+      Serial.println(answer);
+      answer="";
+    }*/
+    BTSerie2.listen(); //Met le premier module bluetooth en ecoute
+    return answer;
+  }
 }
 
 
