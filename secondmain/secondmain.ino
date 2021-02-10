@@ -32,6 +32,8 @@ void setup() {
   InitCommunicationBluetoothSerie2();
   InitCommunicationBluetoothSerie();
   BTSerie2.listen();
+
+  setupSpeaker();
 }
 
 //------------------------------------------------------------------------------
@@ -63,9 +65,7 @@ void loop() {
     if(msg!=""){
       String act = ReceptionBluetoothAscii(msg);
       Serial.print("Master sent : ");
-      if(strcmp(&act[0],"l") == 0 || strcmp(&act[0],"p") == 0){
-        Serial.println("Musique maestro");
-      }else if(act != NULL){
+      if(act != NULL){
         Serial.println(act);
         BTSerie.print(act);
       }

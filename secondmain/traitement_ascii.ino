@@ -9,7 +9,7 @@ String ReceptionBluetoothAscii(String msg){
   if(strstr(c,actions[0])){
     if(strstr(c, modules[0])){//allume la musique
       printOkToClient(0,0,1);
-      action = "l";
+      tmrpcm.play(tab[0]);
     }else if(strstr(c, modules[1])){//allume la lumière
       printOkToClient(0,1,1);
       action = "a";    
@@ -33,16 +33,17 @@ String ReceptionBluetoothAscii(String msg){
       BTSerie2.print("Que voulez vous éteindre?");
     }
   }else if(strstr(c, actions[2])){
-    if(strstr(c, modules[1])){// monte la lumière
-      printOkToClient(2,1,1);
+    if(strstr(c, modules[0])){// monte la musique
+      printOkToClient(2,0,1);
+      setVolumeSpeaker(1);
     }else if(strstr(c, modules[3])){//monte la température
       printOkToClient(2,3,1);
     }else {
       BTSerie2.print("Que voulez vous monter?");
     }
   }else if(strstr(c, actions[3])){
-     if(strstr(c, modules[1])){//baisse la lumière
-      printOkToClient(3,1,1);
+     if(strstr(c, modules[0])){//baisse la musique
+      printOkToClient(3,0,1);
     }else if(strstr(c, modules[3])){//baisse la température
       printOkToClient(3,3,1);
     }else {

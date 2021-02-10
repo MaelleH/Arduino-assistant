@@ -1,4 +1,4 @@
-/*//Libraries 
+//Libraries 
 #include <SD.h>
 #include <TMRpcm.h>
  
@@ -19,14 +19,14 @@ unsigned long previousTime=0;
 unsigned long interval=1000;
 
 //Objects
-TMRpcm tmrpcm;*/
+TMRpcm tmrpcm;
 
 /*******************************************************************
  *                                MAIN
 *******************************************************************/
 //void setup(){
 /* function setup */
- /* Serial.begin(9600);
+ Serial.begin(9600);
   //Init sd shield
   if (!SD.begin(SD_ChipSelectPin)) {Serial.println("SD fail"); return; }
 
@@ -60,7 +60,7 @@ previousTime=millis();
 
  *******************************************************************/
 
-/*void activateOutput(){
+void activateOutput(){
 
 
   if(newMessage == 1) 
@@ -96,6 +96,7 @@ void manageMessage(){
     }
   }
   if(message == "precedent")
+  
   {
     if(index > 0)
     {
@@ -111,4 +112,4 @@ void manageMessage(){
     tmrpcm.pause(); 
   }
   
-}*/
+}
