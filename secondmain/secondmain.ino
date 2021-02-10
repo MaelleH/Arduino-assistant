@@ -3,15 +3,18 @@
 //--------------------DECLARATIONS DE VARIABLES---------------------------
 
 #define RxD 10    //Pin RX donc vers TxD de la carte Bluetooth1
-#define TxD 11   //Pin TX donc vers RxD de la carte Bluetooth1 
+#define TxD 11   //Pin TX donc vers RxD de la carte Bluetooth1
 #define RxD2 6    //Pin RX donc vers TxD de la carte Bluetooth2
 #define TxD2 7   //Pin TX donc vers RxD de la carte Bluetooth2
 
 //Definition des structures de donnees pour les differents module
-SoftwareSerial BTSerie(RxD,TxD); //Module bluetooth 1 => ARDUINO
-SoftwareSerial BTSerie2(RxD2,TxD2); //Module bluetooth 2 => TELEPHONE
+SoftwareSerial BTSerie(RxD,TxD); //Module bluetooth 1
+SoftwareSerial BTSerie2(RxD2,TxD2); //Module bluetooth 2
 
 String msg;
+String answer;
+String portable;
+
 //-------------------Initialisation de la carte et des differents modules------------------
 void setup() {
   
@@ -28,8 +31,7 @@ void setup() {
   //Initialisation des modules bluetooth
   InitCommunicationBluetoothSerie2();
   InitCommunicationBluetoothSerie();
-
-  delay(1000);
+  BTSerie2.listen();
 }
 
 //------------------------------------------------------------------------------
@@ -37,63 +39,54 @@ void setup() {
 
 //---------------------Boucle principale-----------------------------------
 void loop() {
-  BTSerie2.listen();
   //Si le module bluetooth 2 est a l'ecoute
   if(BTSerie2.isListening()) {
-    if(BTSerie2.available()){
-     char* s;
     //Tant qu'il est en reception
-     while (BTSerie2.available()) { 
+     while (BTSerie2.available() > 0) { 
         msg = BTSerie2.readString(); //Reccuperation de l'entree
-        strcat(s,&msg[0]);
+        Serial.println(msg); //Afficage de la temperature sur le premier portable
+        BTSerie.listen(); //Met le premier module bluetooth en ecoute
      }
-     Serial.println("s = ");
-     Serial.println(s);
-     if(s != NULL){
-       ReceptionBluetoothAscii(s);
+  }
+  
+  //readSerialPort();
+  if(BTSerie.isListening()) {
+    //Read answer from slave
+     while (BTSerie.available()) {
+     delay(10);  
+     if (BTSerie.available() >0) {
+       char c = BTSerie.read();  //gets one byte from serial buffer
+       answer += c; //makes the string readString
      }
+   }
+    //Send data to slave
+    if(msg!=""){
+      String act = ReceptionBluetoothAscii(msg);
+      Serial.print("Master sent : ");
+      Serial.println(act);
+      BTSerie.print(act);
+      msg="";
     }
+    //Send answer to monitor
+    if(answer!=""){
+      Serial.print("Slave recieved : ");
+      Serial.println(answer);
+      answer="";
+    }
+    BTSerie2.listen(); //Met le premier module bluetooth en ecoute
   }
+  
 }
 
-
-String handleAskArduino(String c){
-  Serial.println("handle arduino");
-  sendMessageArduino(c);
-  return waitForArduinoMessage();
-}
-
-void sendMessageArduino(String c){
-  delay(1000);
-
-  BTSerie.listen();
-  BTSerie.print(c);
-  Serial.print("message envoye a l'arduino");
-}
-
-
-String waitForArduinoMessage(){
-    int reponse = 0;
-    String answer;
-    
-    BTSerie.listen();
-    Serial.print("dans l'attente d'une reponse");
-     //Met le premier module bluetooth en ecoute
-    
-    while(reponse == 0){
-      if(BTSerie.isListening()) {
-        //Read answer from slave
-        if(BTSerie.available()){
-         while (BTSerie.available()) {
-             answer= BTSerie.readString(); //Reccuperation de l'entree
-         }
-         BTSerie2.listen(); //Met le premier module bluetooth en ecoute
-         Serial.print("réponse reçue" + answer);
-         reponse = 1;
-       }
-     }
-    return answer;
-  }
+void readSerialPort(){
+ while (Serial.available()) {
+   delay(10);  
+   if (Serial.available() >0) {
+     char c = Serial.read();  //gets one byte from serial buffer
+     msg += c; //makes the string readString
+   }
+ }
+ Serial.flush();
 }
 
 
@@ -119,7 +112,7 @@ void InitCommunicationBluetoothSerie() {
 
 
 void InitCommunicationBluetoothSerie2() {
-  BTSerie2.begin(38400);  //9600 den mode normal / 38400 en mode commande
+  BTSerie2.begin(9600);  //9600 den mode normal / 38400 en mode commande
   while (!BTSerie2) {
       Serial.println("Attente reponse bluetooth 2");
   }

@@ -1,76 +1,74 @@
 //Fonction qui permet de traiter le caractère reçu depuis le téléphone
-char actions[][10] ={"allume", "eteint", "monte", "baisse", "info"};
-char modules[][20] ={"musique", "caca", "chauffage", "temperature"};
+char actions[5][10] ={"allume", "eteins", "monte", "baisse", "info"};
+char modules[4][20] ={"musique", "lumiere", "chauffage", "temperature"};
 
 void ReceptionBluetoothAscii(char* c){
   String actionPourArduino = " ";
   String answer;
+  
+  Serial.println(c);
   Serial.println("choix de l'action");
-  if(strstr(c,actions[0])){
-    if(strstr(c, modules[0])){ //allume la musique
-      printOkToClient(0,0,1);
-      actionPourArduino = "";
-    }else if(strstr(c, modules[1])){ //allume la lumière
-      actionPourArduino[0] = 'a';
-      Serial.print("action =");
-      Serial.println(actionPourArduino);
-      printOkToClient(0,1,1);
-    }else if(strstr(c, modules[2])){ //allume le chauffage
+  
+  if(strstr(c,"allume") != NULL){
+    if(strstr(c, "musique") != NULL){ //allume la musique
+      printOkToClient("D'accord, j'allume la musique");
+      actionPourArduino = "m";
+    }else if(strstr(c, "lumiere") != NULL){ //allume la lumière
+      actionPourArduino = "a";
+      printOkToClient("D'accord, j'allume la lumiere");
+    }else if(strstr(c, "chauffage") != NULL){ //allume le chauffage
       actionPourArduino = "c";     
-      printOkToClient(0,2,0);  
+      printOkToClient("D'accord, j'allume le chauffage");  
     }else{
-      BTSerie2.print("Que voulez vous allumer?");
+      BTSerie2.println("Que voulez vous allumer?");
     }
-  }else if(strstr(c, actions[1])){ //eteint la musique
-    if(strstr(c, modules[0])){
-      printOkToClient(1,0,1);
-      actionPourArduino = "";
-    }else if(strstr(c, modules[1])){ //éteint la lumière
-      printOkToClient(1,1,1);
+  }else if(strstr(c, "eteins") != NULL){ //eteint la musique
+    if(strstr(c, "musique") != NULL){
+      printOkToClient("D'accord, j'eteins la musique");
+      actionPourArduino = "i";
+    }else if(strstr(c, "lumiere") != NULL){ //éteint la lumière
+      printOkToClient("D'accord, j'eteins la lumiere");
       actionPourArduino = "e";
-    }else if(strstr(c, modules[2])){ //éteint le chauffage
-      printOkToClient(1,2,0);
+    }else if(strstr(c, "chauffage") != NULL){ //éteint le chauffage
+      printOkToClient("D'accord, j'eteins le chauffage");
       actionPourArduino = "s";      
     }else{
-      BTSerie2.print("Que voulez vous éteindre?");
+      BTSerie2.println("Que voulez vous éteindre?");
     }
-  }else if(strstr(c, actions[2])){ // monte la lumière
-    if(strstr(c, modules[1])){
-      printOkToClient(2,1,1);
-    }else if(strstr(c, modules[3])){ //monte la température
-      printOkToClient(2,3,1);
+  }else if(strstr(c, "monte") != NULL){ // monte la lumière
+    if(strstr(c, "lumiere")){
+      printOkToClient("D'accord, j'monte la lumiere");
+    }else if(strstr(c, "temperature") != NULL){ //monte la température
+      printOkToClient("D'accord, j'monte la temperature");
     }else {
       BTSerie2.print("Que voulez vous monter?");
     }
-  }else if(strstr(c, actions[3])){ //baisse la lumière
-     if(strstr(c, modules[1])){
-      printOkToClient(3,1,1);
-    }else if(strstr(c, modules[3])){ //baisse la température
-      printOkToClient(3,3,1);
+  }else if(strstr(c, "baisse") != NULL){ //baisse la lumière
+     if(strstr(c, "lumiere")){
+      printOkToClient("D'accord, j'baisse la lumiere");
+    }else if(strstr(c, "temperature") != NULL){ //baisse la température
+      printOkToClient("D'accord, j'baisse la temperature");
     }else {
       BTSerie2.print("Que voulez vous baisser?");
     }
-  }else if(strstr(c, actions[4])){ //infos
+  }else if(strstr(c, "info") != NULL){ //infos
     printInfos();
   }
+
   
-  Serial.println("action prete");
-  if(actionPourArduino[0] != ' '){
+  Serial.println(actionPourArduino);
+  if(actionPourArduino != " "){
     Serial.println(actionPourArduino[0]);
     answer = handleAskArduino(actionPourArduino);
     Serial.println(answer);
+  }else{
+    printOkToClient("Je n'ai pas compris");
   }
 }
 
-void printOkToClient(int action, int module, int feminin){
-  BTSerie2.print("D'accord, j'");
-  BTSerie2.print(actions[action]);
-  if(feminin == 0){
-    BTSerie2.print(" le ");
-  }else{
-    BTSerie2.print(" la couille");
-  }
-  BTSerie2.println(modules[module]);
+void printOkToClient(String message){
+  BTSerie2.println(message);
+  delay(10);
 }
 
 void printInfos(){
